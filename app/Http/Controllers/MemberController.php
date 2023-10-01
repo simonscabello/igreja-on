@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
+use App\Models\Member;
+use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\StoreMemberRequest;
 use App\Http\Requests\UpdateMemberRequest;
-use App\Models\Member;
-use App\Services\MemberService;
-use Exception;
-use Illuminate\Http\RedirectResponse;
+use App\Services\Interfaces\MemberServiceInterface;
 
 class MemberController extends Controller
 {
-    public function __construct(private readonly MemberService $memberService)
+    public function __construct(private readonly MemberServiceInterface $memberService)
     {
     }
 
@@ -32,9 +32,9 @@ class MemberController extends Controller
 
             session()->flash('success', trans('member.messages.member_created', ['name' => $member->name]));
 
-            return to_route('members.index');
+            return to_route('members.edit', ['member' => $member]);
         } catch (Exception $exception) {
-            session(
+            session()->flash(
                 'error',
                 trans('member.messages.member_not_created', ['message' => $exception->getMessage()])
             );
@@ -59,12 +59,13 @@ class MemberController extends Controller
             $this->memberService->update($member->id, $request->validated());
 
             session()->flash('success', trans('member.messages.member_updated'));
+
             return to_route('members.edit', ['member' => $member]);
         } catch (Exception $exception) {
-            session(
+            session()->flash(
                 'error',
                 trans('member.messages.member_not_updated', [
-                    'message' => $exception->getMessage()
+                    'message' => $exception->getMessage(),
                 ])
             );
 
@@ -78,12 +79,13 @@ class MemberController extends Controller
             $this->memberService->delete($member->id);
 
             session()->flash('success', trans('member.messages.member_deleted'));
+
             return to_route('members.index');
         } catch (Exception $exception) {
-            session(
+            session()->flash(
                 'error',
                 trans('member.messages.member_not_deleted', [
-                    'message' => $exception->getMessage()
+                    'message' => $exception->getMessage(),
                 ])
             );
 

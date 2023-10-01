@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Repositories\Interfaces;
+namespace App\Services\Interfaces;
 
 use App\Models\Member;
 
-interface MemberRepositoryInterface
+interface MemberServiceInterface
 {
     public function all(): array;
 
